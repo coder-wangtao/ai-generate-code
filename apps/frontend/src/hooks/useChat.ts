@@ -82,7 +82,6 @@ export function useChat() {
     async (content: string, attachments?: { type: "image"; url: string }[]) => {
       // Guard: 防止重复提交
       if (useChatStore.getState().isLoading) return;
-
       // 版本管理：判断是创建还是编辑
       const isEditing = messages.some((m) => m.role === "assistant");
       const operation: "create" | "edit" = isEditing ? "edit" : "create";
@@ -131,6 +130,7 @@ export function useChat() {
         role: "assistant",
         content: "", // 内容后续通过 streaming 填充
       };
+
       const assistantId = assistantMessage.id; // ✨ 保存 ID 用于后续操作
       addMessage(assistantMessage);
 
@@ -148,6 +148,7 @@ export function useChat() {
         "pending",
       );
       const initialPhase = getPhaseByNode(initialType as StreamEventType);
+
       addThought(assistantId, {
         // 传入 messageId
         key: initialType,

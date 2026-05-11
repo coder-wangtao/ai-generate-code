@@ -175,7 +175,8 @@ function SandpackContent({
   // 限制 tab 数量
   const MAX_TABS = 4;
   const prevVisibleFilesRef = useRef<string[]>([]);
-
+  
+  // 保证打开的文件数不超过 4 个，并优先保留当前活动文件。
   useEffect(() => {
     const visibleFiles = sandpack.visibleFiles;
 
@@ -194,12 +195,14 @@ function SandpackContent({
     prevVisibleFilesRef.current = [...visibleFiles];
   }, [sandpack.visibleFiles, sandpack.activeFile, sandpack]);
 
+  // 只在预览模式真正需要更新时触发刷新，避免不必要的 Sandpack 执行。
   useEffect(() => {
     if (viewMode === "code" && code !== lastPreviewCode.current) {
       pendingRefresh.current = true;
     }
   }, [code, viewMode]);
 
+  // 进入预览模式时自动刷新，但仅刷新一次，避免每次渲染浪费性能。
   useEffect(() => {
     if (viewMode !== "preview") {
       return;
@@ -215,6 +218,7 @@ function SandpackContent({
 
   return (
     <div className="relative h-full w-full bg-white">
+      {/* 左侧预览 */}
       <div
         className={viewMode === "preview" ? "h-full" : "hidden"}
         aria-hidden={viewMode !== "preview"}
@@ -230,6 +234,7 @@ function SandpackContent({
         aria-hidden={viewMode !== "code"}
       >
         <div className="relative flex h-full w-full overflow-hidden">
+          {/* 文件树 */}
           <div
             className={`relative flex-shrink-0 h-full flex-col border-r border-gray-200 overflow-hidden transition-all duration-300 ease-in-out ${
               isFileTreeOpen ? "w-[200px]" : "w-0 border-none"
@@ -244,7 +249,7 @@ function SandpackContent({
             </div>
           </div>
 
-          {/* 编辑器容器 */}
+          {/* 编辑器 */}
           <div className="relative flex-1 h-full min-w-0 overflow-hidden">
             <SandpackCodeEditor
               style={{ height: "100%", width: "100%" }}
