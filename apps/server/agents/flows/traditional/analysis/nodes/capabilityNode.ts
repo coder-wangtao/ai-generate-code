@@ -19,7 +19,6 @@ export async function capabilityNode(state: any) {
   }
 
   const intentContext = JSON.stringify(intentData, null, 2);
-
   // 3. 构建消息
   // 让模型扮演架构师，基于 input (Intent) 输出 output (Capabilities)
   const messages = [
@@ -35,6 +34,7 @@ export async function capabilityNode(state: any) {
     "capabilityResult.json",
     "capabilities",
   );
+
   if (mockResult) return mockResult;
 
   console.log("--- Capability Analysis Head Start ---");

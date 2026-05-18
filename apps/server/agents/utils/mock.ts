@@ -29,45 +29,45 @@ export function shouldMock(state: T_Graph, nodeName: string): boolean {
  *        - 如果是函数: (data: any, state: any) => any，允许自定义处理逻辑
  * @returns 如果执行了 Mock，返回结果对象；如果不应 Mock 或出错，返回 null。
  */
-export async function tryExecuteMock(
-  state: T_Graph,
-  nodeName: string,
-  mockFileName: string,
-  processResult: string | ((data: any, state: any) => any),
-) {
-  // 1. 判断是否开启 Mock
-  if (!shouldMock(state, nodeName)) {
-    return null; // 不执行 Mock，交还控制权给真实逻辑
-  }
-
-  console.log(`--- ${nodeName} Head Start (MOCK) ---`);
-
-  // 2. 模拟延迟
-  await new Promise((resolve) => setTimeout(resolve, 100));
-
-  try {
-    // 3. 读取文件
-    const fs = await import("fs/promises");
-    const path = await import("path");
-    const mockPath = path.resolve(process.cwd(), `mock/${mockFileName}`);
-    const fileContent = await fs.readFile(mockPath, "utf-8");
-    const jsonData = JSON.parse(fileContent);
-
-    console.log(`--- ${nodeName} End (MOCK) ---`);
-
-    // 4. 处理结果
-    if (typeof processResult === "string") {
-      // 简单模式：直接包装
-      return { [processResult]: jsonData };
-    } else if (typeof processResult === "function") {
-      // 复杂模式：自定义回调
-      return processResult(jsonData, state);
+  export async function tryExecuteMock(
+    state: T_Graph,
+    nodeName: string,
+    mockFileName: string,
+    processResult: string | ((data: any, state: any) => any),
+  ) {
+    // 1. 判断是否开启 Mock
+    if (!shouldMock(state, nodeName)) {
+      return null; // 不执行 Mock，交还控制权给真实逻辑
     }
 
-    return jsonData; // 默认直接返回
-  } catch (error) {
-    console.error(`[MOCK] Failed to read mock data for ${nodeName}:`, error);
-    // 返回 null 以便调用方决定是否回退到真实逻辑或返回空值
-    return null;
+    console.log(`--- ${nodeName} Head Start (MOCK) ---`);
+
+    // 2. 模拟延迟
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    try {
+      // 3. 读取文件
+      const fs = await import("fs/promises");
+      const path = await import("path");
+      const mockPath = path.resolve(process.cwd(), `mock/${mockFileName}`);
+      const fileContent = await fs.readFile(mockPath, "utf-8");
+      const jsonData = JSON.parse(fileContent);
+
+      console.log(`--- ${nodeName} End (MOCK) ---`);
+
+      // 4. 处理结果
+      if (typeof processResult === "string") {
+        // 简单模式：直接包装
+        return { [processResult]: jsonData };
+      } else if (typeof processResult === "function") {
+        // 复杂模式：自定义回调
+        return processResult(jsonData, state);
+      }
+
+      return jsonData; // 默认直接返回
+    } catch (error) {
+      console.error(`[MOCK] Failed to read mock data for ${nodeName}:`, error);
+      // 返回 null 以便调用方决定是否回退到真实逻辑或返回空值
+      return null;
+    }
   }
-}

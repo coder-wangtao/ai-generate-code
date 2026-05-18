@@ -43,7 +43,7 @@ export class FigmaMCPClient {
       // 创建 MCP 客户端
       this.client = new Client(
         {
-          name: "duyi-figma-make",
+          name: "figma-make",
           version: "1.0.0",
         },
         {

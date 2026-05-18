@@ -27,7 +27,6 @@ router.post("/", async (req: Request, res: Response) => {
   try {
     const { messages, mockConfig: userMockConfig, projectId } = req.body;
     console.log("Received messages count:", messages?.length);
-
     // 解析 Mock 配置 (仅 Traditional 流程使用)
     const mockConfigInput: MockConfig = userMockConfig || DEFAULT_MOCK_PRESET;
     const mockConfig = resolveMockConfig(mockConfigInput);
